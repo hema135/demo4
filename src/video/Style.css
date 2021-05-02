@@ -1,0 +1,10 @@
+.vidRecoder { 
+    max-height: 200px !important; 
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+  }
+  .vdplayer {
+    display: flex;
+    justify-content: center;
+  }
