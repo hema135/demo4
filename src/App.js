@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, useState } from "react";
+import HeaderIcons from "./Icons/headerIcons";
+import VideoPlayer from "./video/VideoPlayer";
+import Recording from "./recording";
+import "./App.css";
+import FooterIcons from "./Icons/footerIcons";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
+class App extends Component {
+  state = {
+    discard: false
+  }
+  onDiscard = () => {
+    this.setState({discard: true})
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.discard) {
+      this.setState({discard: false})
+    }
+  }
+  render() {
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+        <React.Fragment>
+      <div className="container" style={{"padding": "2%"}}>
+        <div class="container-fluid">
+        
+          <div class="row">
+            <HeaderIcons />
+          </div>
+          <div className="col-xs-12 col-md-12 text-center">
+            <VideoPlayer />
+            <Recording isDiscard = {this.state.discard}/>
+          </div>
+          <FooterIcons onDiscard = {this.onDiscard}/>
+        </div>
+      </div>
+    </React.Fragment>
   );
-}
+  }
+};
 
 export default App;
