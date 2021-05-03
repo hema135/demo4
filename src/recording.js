@@ -20,7 +20,7 @@ class Recording extends React.Component {
   render () {
     const { showing } = this.state;
     return (
-      <div className="border border-dark mt-4">
+      <div className="border border-dark mt-4 boxWidth">
         {(!this.state.childVisible && !this.state.audioVisible) && 
             <React.Fragment>
          <div className="border-bottom border-dark" onClick={() => this.onClick("video")}>
