@@ -5,14 +5,15 @@ import './Style.css';
 
 const VideoPlayer = () => {
     return (
+      <section>
         <div className = "row">
-        <div className="col-xs-12 col-md-12 mt-2 vdplayer">
-          <ReactPlayer
-            height="200px"
-            url="https://www.youtube.com/watch?v=ysz5S6PUM-U"
-          />{" "}
+          <div className="col-xs-12 col-md-12 mt-2 vdplayer">
+            <ReactPlayer
+              url="https://www.youtube.com/watch?v=ysz5S6PUM-U"
+            />{" "}
+          </div>
         </div>
-        </div>
+      </section>
     )
 }
 
