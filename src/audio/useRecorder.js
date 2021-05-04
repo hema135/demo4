@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-const useRecorder = () => {
+const useRecorder = (gd) => {
   const [audioURL, setAudioURL] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [recorder, setRecorder] = useState(null);
-
+  let data = null; 
   useEffect(() => {
     // Lazily obtain recorder first time we're recording.
     if (recorder === null) {
@@ -24,6 +24,7 @@ const useRecorder = () => {
     // Obtain the audio when ready.
     const handleData = e => {
       setAudioURL(URL.createObjectURL(e.data));
+      data = e.data;
     };
 
     recorder.addEventListener("dataavailable", handleData);

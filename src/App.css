@@ -72,3 +72,41 @@ h4 {
 /* .recoder {
   background-color: black;
 } */
+
+.pull-right{
+  float: right !important;
+}
+
+.pull-left{
+  float: left !important;
+}
+
+
+/*header*/
+
+header{
+  border-bottom: solid 1px;
+}
+
+header .brand-logo{
+  display: inline-block;
+}
+
+header .brand-logo h4{
+  border-bottom: unset;
+  text-decoration: none;
+}
+
+header .user-menu svg{
+  margin: 20px 10px 0;
+}
+
+
+.in-container{
+  width: 70%;
+  margin: 0 auto;
+}
+
+
+
+
