@@ -8,6 +8,8 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelRoundedIcon from "@material-ui/icons/CancelRounded";
 import AlbumOutlinedIcon from "@material-ui/icons/AlbumOutlined";
 import AudioRecorder from '../audio/AudioRecoder';
+import Modal from "../Modal";
+import Popup from "../popup/welcome";
 
 const icon = [
 	{
@@ -33,7 +35,8 @@ class Recorder extends Component {
 
     state = {
         v: false,
-        a: false
+        a: false,
+        uploadModal: false
     }
 
     handleAVAction = t => {
@@ -72,6 +75,20 @@ class Recorder extends Component {
 
     saveRecording = () => {
 
+    }
+
+    handleUpload = () => {
+        this.setState({
+            a: false,
+            v: false,
+            uploadModal: true
+        })
+    }
+
+    closeModal = () => {
+        this.setState({
+            uploadModal: false
+        })
     }
 
     render() {
@@ -120,7 +137,7 @@ class Recorder extends Component {
                     }
                     <div className="col-sm-12">
                         <div className="btm-action-container in-container">
-                            <button className="btn btn-info">
+                            <button className="btn btn-info" onClick={this.handleUpload}>
                                 Upload
                             </button>
                             <button className="btn btn-danger">
@@ -128,6 +145,10 @@ class Recorder extends Component {
                             </button>
                         </div>
                     </div>
+
+                    <Modal closeOnOverlayClick={true} className="mmmModal" isOpen={this.state.uploadModal} onClose={this.closeModal}>
+                        <Popup />
+                    </Modal>
                 </div>
         )
     }
