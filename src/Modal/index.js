@@ -1,5 +1,6 @@
 import React, { Component, createRef } from 'react'
 import "./style.css";
+import CloseIcon from '@material-ui/icons/Close';
 
 export default class Modal extends Component {
     constructor(props){
@@ -59,7 +60,7 @@ export default class Modal extends Component {
             <div className={`${className} modal modal-overlay`} onClick={this.handleOverlayClick} ref={this.modalOverlay}>
                 {(isClose && closeButtonPos.toLowerCase() == "outside") &&
                     <span className="close-modal-btn">
-                        <i className="fa fa-times-thin" onClick={this.handleClose}/>
+                        <CloseIcon onClick={this.handleClose}/>
                     </span>
                 }
                 <div className="modal-content" ref={this.modalBody}>
@@ -70,7 +71,7 @@ export default class Modal extends Component {
                             </span>
                             {(isClose && closeButtonPos.toLowerCase() == "inside") &&
                                 <span className="close-modal-btn">
-                                    <i className="fa fa-times-thin" onClick={this.handleClose}/>
+                                    <CloseIcon onClick={this.handleClose}/>
                                 </span>
                             }
                         </div>

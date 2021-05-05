@@ -21,6 +21,8 @@ class AudioRecorder extends Component{
     this.setState({
       url: recordedBlob.blobURL
     })
+
+    this.props.onRecordingComplete && this.props.onRecordingComplete(recordedBlob)
   }
 
   render() {
