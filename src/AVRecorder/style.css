@@ -29,6 +29,10 @@
     bottom: 35%;
 }
 
+.video-recorder .dRpdkh{
+    display: none;
+}
+
 .foot-icon {
     margin: 30px auto !important;
     display: flex;

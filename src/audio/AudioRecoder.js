@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { ReactMic } from 'react-mic';
 import "./style.css";
 class AudioRecorder extends Component{ 
@@ -7,6 +7,10 @@ class AudioRecorder extends Component{
     this.state = {
       record: false
     }
+
+    this.start = createRef()
+    this.stop = createRef()
+    this._audioPlay = createRef();
   }
 
   startRecording = () => {
@@ -25,6 +29,10 @@ class AudioRecorder extends Component{
     this.props.onRecordingComplete && this.props.onRecordingComplete(recordedBlob)
   }
 
+  audioPlay = () => {
+    this._audioPlay.current && this._audioPlay.current.play();
+  }
+
   render() {
     return (
       <div className="react-mic-container">
@@ -37,10 +45,31 @@ class AudioRecorder extends Component{
             backgroundColor="#000000" 
           />
         </div>
-        <audio controls controlsList="nodownload" src={this.state.url || ""}/>
+        <audio 
+          controls 
+          controlsList="nodownload" 
+          src={this.state.url || ""}
+          ref={this._audioPlay}
+        />
         <div className="btn-container">
-          <button disabled={this.state.record} className="btn btn-success" onClick={this.startRecording} type="button">Start</button>
-          <button className="btn btn-danger" disabled={!this.state.record} onClick={this.stopRecording} type="button">Stop</button>
+          <button 
+            disabled={this.state.record} 
+            className="btn btn-success" 
+            onClick={this.startRecording} 
+            type="button"
+            ref={this.start}
+          >
+              Start
+          </button>
+          <button 
+            className="btn btn-danger" 
+            disabled={!this.state.record} 
+            onClick={this.stopRecording} 
+            type="button"
+            ref={this.stop}
+          >
+              Stop
+          </button>
         </div>
       </div>
     );

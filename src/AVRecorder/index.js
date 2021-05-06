@@ -43,6 +43,8 @@ class Recorder extends Component {
         recentUploads: [],
         previewModal: false
     }
+    _vRecorder = createRef();
+    _aRecorder = createRef();
 
     handleAVAction = t => {
         let { a, v } = this.state;
@@ -74,6 +76,33 @@ class Recorder extends Component {
 
         if(a == 'preview'){
             this.playRecording()
+        }
+    }
+
+    resetRecorder = () => {
+        if(!this.state.blob) return false;
+        let r;
+        if(this.state.v){
+            r = this._vRecorder && this._vRecorder.current;
+            r.recorder && r.recorder.current && r.recorder.current.handleStopReplaying();
+        }
+        if(this.state.a){
+            r = this._aRecorder && this._aRecorder.current;
+            console.log(r);
+            r.startRecording && r.startRecording();
+        }
+    }
+
+    playRecording = () => {
+        if(!this.state.blob) return false;
+        let r;
+        if(this.state.v){
+            r = this._vRecorder && this._vRecorder.current;
+            r.recorder && r.recorder.current && r.recorder.current.replayVideo.play();
+        }
+        if(this.state.a){
+            r = this._aRecorder && this._aRecorder.current;
+            r.audioPlay && r.audioPlay(); 
         }
     }
 
@@ -183,13 +212,19 @@ class Recorder extends Component {
                     }
                     {v && 
                         <div className="col-sm-12">
-                            <VideoRecord onRecordingComplete={this.handleRecordComplete}/>
+                            <VideoRecord 
+                                onRecordingComplete={this.handleRecordComplete} 
+                                ref={this._vRecorder}
+                            />
                         </div>
                     }
                     {a &&
                         <div className="col-sm-12">
                             <div className="in-container ad-rec-con">
-                                <AudioRecorder onRecordingComplete={this.handleRecordComplete}/>
+                                <AudioRecorder 
+                                    onRecordingComplete={this.handleRecordComplete}
+                                    ref={this._aRecorder}
+                                />
                             </div>
                         </div>
                     }
