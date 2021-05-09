@@ -14,7 +14,9 @@ const HeaderIcons = () => {
             </div>
             <div className="user-menu pull-right">
               <AccountBoxIcon  />
-              <SettingsPowerIcon  />
+              <a href="/logout">
+                <SettingsPowerIcon  />
+              </a>
             </div>
         </div>
       </div>

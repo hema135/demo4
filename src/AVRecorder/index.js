@@ -41,7 +41,8 @@ class Recorder extends Component {
         a: false,
         uploadModal: false,
         recentUploads: [],
-        previewModal: false
+        previewModal: false,
+        saveModal: false
     }
     _vRecorder = createRef();
     _aRecorder = createRef();
@@ -125,6 +126,7 @@ class Recorder extends Component {
                 recentUploads.slice(0, 4);
                 this.setState({
                     uploadModal: true,
+                    saveModal: true,
                     recentUploads,
                     a: false,
                     v: false
@@ -189,6 +191,18 @@ class Recorder extends Component {
             }
         })
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.uploadModal && this.state.saveModal){
+            if(this.t) return;
+            this.t = setTimeout(() => {
+                this.setState({
+                    uploadModal: false,
+                    saveModal: false
+                })
+            }, 1000)
+        }
+    }
     
     render() {
         let { a, v } = this.state;
@@ -251,10 +265,31 @@ class Recorder extends Component {
                         </div>
                     </div>
 
-                    <Modal closeOnOverlayClick={true} className="mmmModal" isOpen={this.state.uploadModal} onClose={this.closeModal}>
-                        <Popup />
+                    <Modal 
+                        closeOnOverlayClick={true} 
+                        className="mmmModal" 
+                        isOpen={this.state.uploadModal} 
+                        onClose={this.closeModal}
+                    >
+                        {this.state.saveModal && 
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <div className="alert alert-success text-center">
+                                        Your recording saved successfully.
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        {!this.state.saveModal &&
+                            <Popup />
+                        }
                     </Modal>
-                    <Modal header={"Play Recents"} className="preview-modal" isOpen={this.state.previewModal} onClose={this.togglePreviewModal}>
+                    <Modal 
+                        header={"Play Recents"} 
+                        className="preview-modal" 
+                        isOpen={this.state.previewModal} 
+                        onClose={this.togglePreviewModal}
+                    >
                         <div className="row">
                             <div className="col-sm-12">
                                 {this.state.recentUploads.length <= 0 &&
