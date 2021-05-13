@@ -12,24 +12,31 @@ import AudioRecorder from '../audio/AudioRecoder';
 import Modal from "../Modal";
 import Popup from "../popup/welcome";
 import axios from 'axios';
-import ReactPlayer from "react-player";
+import CloseIcon from '@material-ui/icons/Close';
+import moment from "moment";
+
 
 const icon = [
 	{
 		icon: <VideoLibraryIcon style={{ "fontSize": "-webkit-xxx-large" }}/>,
-		label: "PREVIEW"
+        label: "Preview this recording before send or save",
+        value:  "preview"
 	},
 	{
 		icon: <CheckCircleIcon style={{ "fontSize": "-webkit-xxx-large" }} />,
-		label: "SAVE THIS RECORDING"
+        label: "Save this recording in database for later select & send",
+        value: "save"
+
 	},
 	{
 		icon: <CancelRoundedIcon style={{ "fontSize": "-webkit-xxx-large" }} />,
-		label: "DISCARD THIS"
+        label: "Discard this recording",
+        value: "discard"
 	},
 	{
 		icon: <AlbumOutlinedIcon style={{ "fontSize": "-webkit-xxx-large" }} />,
-		label: "RECORD AGAIN"
+        label: "Record again / Start new recording",
+        value: "record"
 	}
 ];
 
@@ -63,15 +70,15 @@ class Recorder extends Component {
 
     handleAction = action => {
         let a = action.toLowerCase();
-        if(a == 'discard this'){
-            this.setState({a: false, v: false});
+        if(a == 'discard'){
+            this.setState({a: false, v: false, blob: null});
         }
 
-        if(a == 'save this recording'){
+        if(a == 'save'){
             this.saveRecording()
         }
 
-        if(a == 'record again'){
+        if(a == 'record'){
             this.resetRecorder()
         }
 
@@ -80,8 +87,9 @@ class Recorder extends Component {
         }
     }
 
+
     resetRecorder = () => {
-        if(!this.state.blob) return false;
+        // if(!this.state.blob) return false;
         let r;
         if(this.state.v){
             r = this._vRecorder && this._vRecorder.current;
@@ -89,7 +97,6 @@ class Recorder extends Component {
         }
         if(this.state.a){
             r = this._aRecorder && this._aRecorder.current;
-            console.log(r);
             r.startRecording && r.startRecording();
         }
     }
@@ -107,7 +114,7 @@ class Recorder extends Component {
         }
     }
 
-    saveRecording = () => {
+    saveRecording = (status) => {
         let blob = this.state.blob;
         if(!blob) return false;
         let d = new FormData();
@@ -117,6 +124,9 @@ class Recorder extends Component {
             d.append("type", 'audio');
         if(this.state.v)
             d.append("type", 'video');
+        
+        if(status)
+            d.append('status', status);
 
         axios.post("/api/v1/uploads", d)
         .then(resp => {
@@ -126,10 +136,13 @@ class Recorder extends Component {
                 recentUploads.slice(0, 4);
                 this.setState({
                     uploadModal: true,
-                    saveModal: true,
+                    saveModal: !status && true,
                     recentUploads,
+                    lastSavedVideo: !status && resp.data._id,
+                    blob: null,
                     a: false,
-                    v: false
+                    v: false,
+                    emptyUpload: false
                 })
             }
         })
@@ -138,11 +151,48 @@ class Recorder extends Component {
         })
     }
 
+    sendAVforAnalysis = (id) => {
+        axios.patch("/api/v1/uploads", {
+            id: id,
+            status: 'active'
+        })
+        .then(resp => {
+            if(resp && resp.status == 200){
+                let recentUploads = [...this.state.recentUploads];
+                let i =  recentUploads.findIndex(el => el._id, id)
+                if(i != -1){
+                    recentUploads[i].status = "active"
+                }
+                this.setState({
+                    a:false,
+                    v: false,
+                    uploadModal: true,
+                    recentUploads,
+                    lastSavedVideo: null,
+                    blob: null,
+                    previewModal: false,
+                    emptyUpload: false
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        }) 
+    }
+
     handleUpload = () => {
+        
+        if(this.state.blob){
+            return this.saveRecording("active");
+        }
+
+        if(this.state.lastSavedVideo){
+            return this.sendAVforAnalysis(this.state.lastSavedVideo)
+        }
+        
         this.setState({
-            a: false,
-            v: false,
-            uploadModal: true
+            uploadModal: true,
+            emptyUpload: true
         })
     }
 
@@ -184,6 +234,11 @@ class Recorder extends Component {
     }
 
     handlePlayAV = (id, url, type) => {
+        if(this.state.playMe && this.state.playMe.id == id){
+            return this.setState({
+                playMe: null
+            })
+        }
         this.setState({
             playMe: {
                 id,
@@ -193,12 +248,15 @@ class Recorder extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(this.state.uploadModal && this.state.saveModal){
+        console.log(this.state.uploadModal && (this.state.saveModal || this.state.emptyUpload))
+        if(this.state.uploadModal && (this.state.saveModal || this.state.emptyUpload)){
             if(this.t) return;
             this.t = setTimeout(() => {
+                this.t = null;
                 this.setState({
                     uploadModal: false,
-                    saveModal: false
+                    saveModal: false,
+                    emptyUpload: false
                 })
             }, 1000)
         }
@@ -246,7 +304,7 @@ class Recorder extends Component {
                         <div className="col-sm-12">
                             <div className="foot-icon in-container">
                                 {icon.map((el, i) => 
-                                    <div className="icon-set" key={i} onClick={() => this.handleAction(el.label)}>
+                                    <div className="icon-set" key={i} onClick={() => this.handleAction(el.value)}>
                                         {el.icon}
                                         <b>{el.label}</b>
                                     </div>
@@ -257,10 +315,12 @@ class Recorder extends Component {
                     <div className="col-sm-12">
                         <div className="btm-action-container in-container">
                             <button className="btn btn-info" onClick={this.handleUpload}>
-                                Upload
+                                Send this recording for analysis
+                                {/* SEND THIS RECORD FOR ANALYSIS */}
                             </button>
                             <button className="btn btn-danger" onClick={this.togglePreviewModal}>
-                                Browse Saved Recordings & Upload
+                                Browse & select from saved recordings to send
+                                {/* BROWSE & SELECT FROM SAVED RECORDINGS TO SEND */}
                             </button>
                         </div>
                     </div>
@@ -271,7 +331,19 @@ class Recorder extends Component {
                         isOpen={this.state.uploadModal} 
                         onClose={this.closeModal}
                     >
-                        {this.state.saveModal && 
+                        <span className="close-modal-btn">
+                            <CloseIcon onClick={this.closeModal} />
+                        </span>
+                        {this.state.emptyUpload &&
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <div className="alert alert-info" style={{marginTop: 20}}>
+                                        Please make a recording first to send it for analysis.
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        {!this.state.emptyUpload && this.state.saveModal && 
                             <div className="row">
                                 <div className="col-sm-12">
                                     <div className="alert alert-success text-center">
@@ -280,7 +352,7 @@ class Recorder extends Component {
                                 </div>
                             </div>
                         }
-                        {!this.state.saveModal &&
+                        {!this.state.emptyUpload && !this.state.saveModal &&
                             <Popup />
                         }
                     </Modal>
@@ -298,32 +370,84 @@ class Recorder extends Component {
                                     </div>
                                 }
                                 {this.state.recentUploads.length > 0 &&
-                                    this.state.recentUploads.map((el, i) => 
-                                        <div className='dd-hanger' key={i} onClick={() => this.handlePlayAV(el._id, el.url, el.type)}>
-                                            <PlayCircleOutlineIcon />
-                                            <span>
-                                                {el.filename}
-                                            </span>
-                                            <span className="pull-right">
-                                                ({el.type && el.type.toUpperCase()})
-                                            </span>
-                                            {(this.state.playMe && this.state.playMe.id == el._id) &&
-                                                <div className="play-me">
-                                                    {el.type == 'audio' &&
-                                                        <audio autoPlay src={`/${el.url}`} controls />
+                                    <table className="table-stripped table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    S.No
+                                                </th>
+                                                <th>
+                                                    Date/Time
+                                                </th>
+                                                <th>
+                                                    Filename
+                                                </th>
+                                                <th>
+                                                    File Type
+                                                </th>
+                                                <th>
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {this.state.recentUploads.map((el, i) =>
+                                                <React.Fragment key={i}>
+                                                    <tr>
+                                                        <td>
+                                                            {i+1}
+                                                        </td>
+                                                        <td>
+                                                            {moment(el.created_at).format("DD MMM YYYY HH:MM a")}
+                                                        </td>
+                                                        <td>
+                                                            {el.filename}
+                                                        </td>
+                                                        <td>
+                                                            {el.type.toUpperCase()}
+                                                        </td>
+                                                        <td>
+                                                            <button className="btn btn-success" style={{marginRight: 10}} onClick={() => this.handlePlayAV(el._id, el.url, el.type)}>
+                                                                {this.state.playMe && 
+                                                                    "Close Player"
+                                                                }
+                                                                {!this.state.playMe &&
+                                                                    <>
+                                                                        Play <PlayCircleOutlineIcon />
+                                                                    </>
+                                                                }
+                                                            </button>
+                                                            {el.status !== 'active' && 
+                                                                <button className="btn btn-info" onClick={() => this.sendAVforAnalysis(el._id)}>
+                                                                    Send
+                                                                </button>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    {(this.state.playMe && this.state.playMe.id == el._id) &&
+                                                        <tr>
+                                                            <td colSpan="10">
+                                                                <div className="play-me text-center">
+                                                                    {el.type == 'audio' &&
+                                                                        <audio autoPlay src={`/${el.url}`} controls />
+                                                                    }
+                                                                    {el.type == 'video' &&
+                                                                        <video
+                                                                            src={`/${el.url}`}
+                                                                            width="100%"
+                                                                            controls
+                                                                            autoPlay
+                                                                        />
+                                                                    } 
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
-                                                    {el.type == 'video' &&
-                                                        <video
-                                                            src={`/${el.url}`}
-                                                            width="100%"
-                                                            controls
-                                                            autoPlay
-                                                        />
-                                                    } 
-                                                </div>
-                                            }
-                                        </div>
-                                )}
+                                                </React.Fragment>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                }
                             </div>
                         </div>
                     </Modal>

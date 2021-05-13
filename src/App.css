@@ -97,8 +97,23 @@ header .brand-logo h4{
   text-decoration: none;
 }
 
-header .user-menu svg{
-  margin: 20px 10px 0;
+header .user-menu{
+  position: absolute;
+  top: 18px;
+  right: 10px;
+}
+header .user-menu .username{
+  font-weight: 500;
+}
+
+header .user-menu svg:last-child{
+  color: red;
+}
+
+header .user-menu svg,
+header .user-menu .username{
+  display: inline-block;
+  margin: 0px 10px 0;
 }
 
 

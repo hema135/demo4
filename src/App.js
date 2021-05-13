@@ -15,6 +15,7 @@ import Signin from "./auth/signin";
 import Signup from "./auth/signup";
 import Page404 from "./404";
 import axios from "axios";
+import Records from "./Records";
 
 class App extends Component {
 	state = {
@@ -71,12 +72,14 @@ class App extends Component {
 						}
 					</Route>
 					<Route exact path="/">
-						{(!user || !user._id) ? <Redirect to="/login" />:
-							<div className="app">
-								<Header />
-								<Main />
-							</div>
-						}
+						<Layout user={user}>
+							<Main />
+						</Layout>
+					</Route>
+					<Route exact path="/records">
+						<Layout user={user}>
+							<Records />
+						</Layout>
 					</Route>
 					<Route>
 						<Page404 />
@@ -86,5 +89,15 @@ class App extends Component {
 		);
 	}
 };
+
+const Layout = ({user, children}) => {
+	if(!user || !user._id)  
+		return <Redirect to="/login" />
+	
+	return 	<div className="app">
+				<Header user={user}/>
+				{children}
+			</div>
+}
 
 export default App;

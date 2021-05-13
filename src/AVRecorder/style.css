@@ -113,3 +113,20 @@
 .dd-hanger:last-child{
     border-bottom: unset;
 }
+
+.mmmModal .close-modal-btn{
+    position: absolute;
+    top: -25px !important;
+    right: -30px !important;
+    color: red !important;
+}
+
+.preview-modal .modal-content{
+    max-width: 1040px !important;
+}
+
+.play-me audio,
+.play-me video
+{
+    width: 100%;
+}
