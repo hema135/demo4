@@ -2,7 +2,7 @@ import React from "react";
 import SportsHockeyIcon from "@material-ui/icons/SportsHockey";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import SettingsPowerIcon from "@material-ui/icons/SettingsPower";
-
+import { NavLink } from 'react-router-dom'
 const HeaderIcons = ({ user }) => {
   return (
     <header className="container-fluid">
@@ -18,10 +18,19 @@ const HeaderIcons = ({ user }) => {
                   `${user.firstName} ${user.lastName}`
                 }
               </span>
-              <AccountBoxIcon  /> 
-              <a href="/logout">
-                <SettingsPowerIcon  />
-              </a>
+              {!user &&
+                <NavLink to="/login">
+                  Login
+                </NavLink>
+              }
+              {user &&
+                <>
+                <AccountBoxIcon  /> 
+                <a href="/logout">
+                  <SettingsPowerIcon  />
+                </a>
+                </>
+              }
             </div>
         </div>
       </div>

@@ -69,6 +69,13 @@ class Records extends Component {
                                 </tr>
                             </thead>
                             <tbody>
+                                {records.length == 0 &&
+                                    <tr>
+                                        <td colSpan="10" className="text-center">
+                                            No Records Found
+                                        </td>
+                                    </tr>
+                                }
                                 {records.map((el, i) => 
                                     <tr key={el._id}>
                                         <td>

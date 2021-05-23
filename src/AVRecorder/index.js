@@ -408,10 +408,8 @@ class Recorder extends Component {
                                                         </td>
                                                         <td>
                                                             <button className="btn btn-success" style={{marginRight: 10}} onClick={() => this.handlePlayAV(el._id, el.url, el.type)}>
-                                                                {this.state.playMe && 
-                                                                    "Close Player"
-                                                                }
-                                                                {!this.state.playMe &&
+                                                                {(this.state.playMe && this.state.playMe.id == el._id) ?
+                                                                    "Close Player" : 
                                                                     <>
                                                                         Play <PlayCircleOutlineIcon />
                                                                     </>

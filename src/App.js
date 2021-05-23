@@ -77,7 +77,7 @@ class App extends Component {
 						</Layout>
 					</Route>
 					<Route exact path="/records">
-						<Layout user={user}>
+						<Layout user={user} isAuthReq={false}>
 							<Records />
 						</Layout>
 					</Route>
@@ -90,8 +90,8 @@ class App extends Component {
 	}
 };
 
-const Layout = ({user, children}) => {
-	if(!user || !user._id)  
+const Layout = ({user, children, isAuthReq}) => {
+	if(isAuthReq !== false && (!user || !user._id))  
 		return <Redirect to="/login" />
 	
 	return 	<div className="app">
