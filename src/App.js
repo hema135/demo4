@@ -35,7 +35,6 @@ class App extends Component {
 	componentDidMount() {
 		axios.get(`api/v1/getUserDetails`)
 		.then(resp => {
-			console.log(resp.data._id)
 			if(resp && resp.status == 200 && resp.data._id){
 				return this.setState({
 					user: resp.data,
@@ -47,7 +46,6 @@ class App extends Component {
 			})
 		})
 		.catch(err=> {
-			console.log("err", err);
 			this.setState({
 				loading: false
 			})

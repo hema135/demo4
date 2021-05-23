@@ -248,7 +248,7 @@ class Recorder extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.state.uploadModal && (this.state.saveModal || this.state.emptyUpload))
+        (this.state.uploadModal && (this.state.saveModal || this.state.emptyUpload))
         if(this.state.uploadModal && (this.state.saveModal || this.state.emptyUpload)){
             if(this.t) return;
             this.t = setTimeout(() => {
